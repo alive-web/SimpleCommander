@@ -23,3 +23,10 @@ class BaseGame(object):
     def destroy_unit(self, unit):
         unit.destroy()
         del self.units[unit]
+
+    def broadcast(self, signal):
+        self.on(signal)
+
+    def on(self, signal):
+        for unit in self.units.values():
+            unit.on(signal)

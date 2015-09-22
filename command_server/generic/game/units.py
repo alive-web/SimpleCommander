@@ -1,5 +1,6 @@
 import asyncio
 from collections import namedtuple
+from generic.game.signals import Signal
 
 Position2D = namedtuple('Position2D', ['x', 'y'])
 Position3D = namedtuple('Position3D', ['x', 'y', 'z'])
@@ -27,8 +28,18 @@ class BaseUnit(object):
     def destroy(self):
         self._timer.cancel()
 
-    def trigger(self, state):
-        pass
+    def broadcast_signal(self, signal):
+        self._game.broadcast(signal)
+
+    def broadcast(self, signal_name, *args, **kwargs):
+        signal = Signal(signal_name, *args, **kwargs)
+        self.broadcast_signal(signal)
+
+    def on(self, signal):
+        assert isinstance(signal, Signal), 'Bad signal type'
+        method = getattr(self, 'on_{}'.format(signal.name))
+        if method and callable(method):
+            method(*signal.args, **signal.kwargs)
 
 class Positioned2DMixin(object):
     position = Position2D(x=0, y=0)
