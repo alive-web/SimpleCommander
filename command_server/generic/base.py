@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 import aiohttp_jinja2
 import json
 
@@ -63,3 +64,14 @@ class TemplateResponseMixin(object):
 
 class TemplateView(TemplateResponseMixin, BaseView):
     pass
+
+
+class RedirectView(BaseView):
+    redirect_url = None
+
+    @asyncio.coroutine
+    def get(self, request, *args, **kwargs):
+        return
+
+    def finalize_response(self, response):
+        return aiohttp.web.HTTPFound(response or self.redirect_url)

@@ -14,5 +14,5 @@ class Room(object):
         OPENED_ROOMS[id] = self
 
     @classmethod
-    def start_new(cls, game_class):
-        return cls(str(uuid.uuid4()), game_class)
+    def start_new(cls, game_slug):
+        return cls(str(uuid.uuid4()), game_slug)

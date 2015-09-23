@@ -26,7 +26,7 @@ class BaseGame(metaclass=game):
             'slug': cls.slug,
         }
 
-    def __init__(self, loop):
+    def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
         self.units = {}
 
