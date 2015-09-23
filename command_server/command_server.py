@@ -6,6 +6,7 @@ import jinja2
 import websockets
 
 import views
+import generic.game.base
 
 from aiohttp import server, web
 from time import gmtime, strftime
