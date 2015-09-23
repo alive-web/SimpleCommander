@@ -6,7 +6,7 @@ from generic.game.exeptions import GameAlreadyExists, GameNotExists
 class game(type):
      def __new__(cls, name, bases, attrs):
         new_cls = type.__new__(cls, name, bases, attrs)
-        if attrs.slug:
+        if attrs['slug']:
             if attrs.slug in REGISTERED_GAMES:
                 raise GameAlreadyExists
             REGISTERED_GAMES[new_cls] = new_cls
@@ -18,13 +18,21 @@ class BaseGame(metaclass=game):
     version = '0.1.0'
     slug = None
 
-    def __init__(self, loop):
-        self.loop = loop or asyncio.get_event_loop()
-        self.units = {}
-
     @classmethod
     def __hash__(cls):
         return '{}'.format(cls.__name__)
+
+    @classmethod
+    def info(cls):
+        return {
+            'name': cls.name,
+            'version:': cls.version,
+            'slug': cls.slug,
+        }
+
+    def __init__(self, loop):
+        self.loop = loop or asyncio.get_event_loop()
+        self.units = {}
 
     def __repr__(self):
         return  '{} <{}>'.format(self.name, self.version)
