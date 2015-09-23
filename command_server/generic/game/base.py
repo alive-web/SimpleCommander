@@ -7,9 +7,9 @@ class game(type):
      def __new__(cls, name, bases, attrs):
         new_cls = type.__new__(cls, name, bases, attrs)
         if attrs['slug']:
-            if attrs.slug in REGISTERED_GAMES:
+            if attrs['slug'] in REGISTERED_GAMES:
                 raise GameAlreadyExists
-            REGISTERED_GAMES[new_cls] = new_cls
+            REGISTERED_GAMES[attrs['slug']] = new_cls
         return new_cls
 
 
@@ -17,10 +17,6 @@ class BaseGame(metaclass=game):
     name = 'Game'
     version = '0.1.0'
     slug = None
-
-    @classmethod
-    def __hash__(cls):
-        return '{}'.format(cls.__name__)
 
     @classmethod
     def info(cls):
