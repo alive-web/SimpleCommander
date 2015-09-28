@@ -3,6 +3,7 @@ import aiohttp
 import aiohttp_jinja2
 import json
 
+from aiohttp import web
 from aiohttp.web_reqrep import Response
 
 
@@ -75,3 +76,26 @@ class RedirectView(BaseView):
 
     def finalize_response(self, response):
         return aiohttp.web.HTTPFound(response or self.redirect_url)
+
+
+class WebSocketView(BaseView):
+
+    @asyncio.coroutine
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        self.ws = web.WebSocketResponse()
+        self.ws.start(request)
+        while True:
+            msg = yield from self.ws.receive()
+            self.on_message(msg)
+
+    def on_message(self, msg):
+        pass
+
+    def send(self, msg):
+        if not isinstance(msg, str):
+            msg = json.dumps(msg)
+        self.ws.send_str(msg)
+
+    def get(self):
+        pass

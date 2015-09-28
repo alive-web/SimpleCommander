@@ -52,7 +52,7 @@ class BaseGame(metaclass=game):
             unit.on(signal)
 
     def push(self, state):
-        self.transport.push(state)
+        self.transport.send(state)
 
     def start(self):
         self.start_time = time.time() * 1000
@@ -68,7 +68,7 @@ class GameFactory(object):
         self.game_slug = game_slug
 
     def __call__(self, *args, **kwargs):
-        self.create(*args, **kwargs)
+        return self.create(*args, **kwargs)
 
     def create(self, *args, **kwargs):
         if self.game_slug not in REGISTERED_GAMES:
