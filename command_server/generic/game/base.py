@@ -1,4 +1,5 @@
 import asyncio
+import time
 from generic.game import REGISTERED_GAMES
 from generic.game.exeptions import GameAlreadyExists, GameNotExists
 
@@ -28,7 +29,10 @@ class BaseGame(metaclass=game):
 
     def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
+        self.transport = None
+
         self.units = {}
+        self.start_time = 0 #store game start in timestamp
 
     def __repr__(self):
         return  '{} <{}>'.format(self.name, self.version)
@@ -46,6 +50,16 @@ class BaseGame(metaclass=game):
     def on(self, signal):
         for unit in self.units.values():
             unit.on(signal)
+
+    def push(self, state):
+        self.transport.push(state)
+
+    def start(self):
+        self.start_time = time.time() * 1000
+
+    @property
+    def time(self):
+        return (time.time() * 1000) - self.start_time
 
 
 class GameFactory(object):
