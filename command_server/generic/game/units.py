@@ -22,7 +22,7 @@ class BaseUnit(object):
     def _digest(self):
         self.digest()
         self.state(self).push()
-        self._timer = self._loop.call_later(self.speed_period/1000, self.digest)
+        self._timer = self._loop.call_later(self.speed_period/1000, self._digest)
 
     def digest(self):
         """

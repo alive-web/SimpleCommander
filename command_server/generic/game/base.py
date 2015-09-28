@@ -18,6 +18,7 @@ class BaseGame(metaclass=game):
     name = 'Game'
     version = '0.1.0'
     slug = None
+    keep_alive_period = 5
 
     @classmethod
     def info(cls):
@@ -29,7 +30,7 @@ class BaseGame(metaclass=game):
 
     def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
-        self.transport = None
+        self._transport = None
 
         self.units = {}
         self.start_time = 0 #store game start in timestamp
@@ -51,6 +52,15 @@ class BaseGame(metaclass=game):
         for unit in self.units.values():
             unit.on(signal)
 
+    @property
+    def transport(self):
+        return self._transport
+
+    @transport.setter
+    def transport(self, value):
+        self._transport = value
+        self._keep_alive_timer = self.loop.call_later(self.keep_alive_period, self.keep_alive)
+
     def push(self, state):
         self.transport.send(state)
 
@@ -60,6 +70,10 @@ class BaseGame(metaclass=game):
     @property
     def time(self):
         return (time.time() * 1000) - self.start_time
+
+    def keep_alive(self):
+        self.transport.send(self.info())
+        self._keep_alive_timer = self.loop.call_later(self.keep_alive_period, self.keep_alive)
 
 
 class GameFactory(object):
