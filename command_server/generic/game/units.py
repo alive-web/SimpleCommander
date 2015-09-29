@@ -9,9 +9,12 @@ Position3D = namedtuple('Position3D', ['x', 'y', 'z'])
 class BaseUnit(object):
     name = 'Unit'
     speed_period = 300 #miliseconds needs to update state
-    state = UnitState
+    state_class = UnitState
 
     def __init__(self, game):
+        """
+        :param game: BaseGame
+        """
         self._game = game
         self._loop = game.loop or asyncio.get_event_loop()
         self._timer = self._loop.call_later(self.speed_period/1000, self._digest)
@@ -21,7 +24,7 @@ class BaseUnit(object):
 
     def _digest(self):
         self.digest()
-        self.state(self).push()
+        self.state.push()
         self._timer = self._loop.call_later(self.speed_period/1000, self._digest)
 
     def digest(self):
@@ -47,28 +50,59 @@ class BaseUnit(object):
         if method and callable(method):
             method(*signal.args, **signal.kwargs)
 
+    @property
+    def time(self):
+        return self._game.time
+
+    @property
+    def state(self):
+        return self.state_class(self)
+
+    @state.setter
+    def state(self, new_state):
+        for attr, value in new_state.iteritem():
+            setattr(self, attr, value)
+
 
 class UnitState(dict):
     """
     All changes with units should be touched theirs state. It is as list of attributes that changes over time.
     State should be serializable, for sending it to client and store as game log.
+    Serializable view:
+    {
+        _time: <timestamp in milliseconds>,
+        attr1: value1,
+        ...
+        attrN: valueN,
+    }
     """
     attributes = ()
 
     def __init__(self, unit, **kwargs):
         super().__init__(**kwargs)
         self.unit = unit
-        self.time = unit._game.time
-        unit.state = self
+        self.time = unit.time
 
     def __iter__(self):
-        return (attr for attr in self.attributes if hasattr(self.unit, attr))
+        for attr in self.attributes:
+            if hasattr(self.unit, attr):
+                yield attr
+        yield '_time'
 
     def __getitem__(self, item):
-        return getattr(self.unit, item, None)
+        return getattr(self.unit, item, None) if item != '_time' else self.time
 
     def push(self):
         self.unit._game.push(self)
+
+    @classmethod
+    def create_from_dict(cls, state_dict):
+        unit = object()
+        unit._game = object()
+        unit._game.time = state_dict.pop('_time')
+        unit.__dict__ = state_dict
+        return cls(unit)
+
 
 class Positioned2DMixin(object):
     position = Position2D(x=0, y=0)
