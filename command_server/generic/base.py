@@ -5,6 +5,7 @@ import json
 
 from aiohttp import web
 from aiohttp.web_reqrep import Response
+from generic.encoders import IterableJSONEncoder
 
 
 class BaseView(object):
@@ -94,7 +95,7 @@ class WebSocketView(BaseView):
 
     def send(self, msg):
         if not isinstance(msg, str):
-            msg = json.dumps(msg)
+            msg = json.dumps(msg, cls=IterableJSONEncoder)
         self.ws.send_str(msg)
 
     def get(self):

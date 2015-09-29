@@ -2,6 +2,7 @@ import asyncio
 import time
 from generic.game import REGISTERED_GAMES
 from generic.game.exeptions import GameAlreadyExists, GameNotExists
+from generic.game.signals import Signal
 
 
 class game(type):
@@ -31,9 +32,14 @@ class BaseGame(metaclass=game):
     def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
         self._transport = None
+        self._delayed_start = False
 
         self.units = {}
         self.start_time = 0 #store game start in timestamp
+        self.init()
+
+    def init(self):
+        pass
 
     def __repr__(self):
         return  '{} <{}>'.format(self.name, self.version)
@@ -60,12 +66,18 @@ class BaseGame(metaclass=game):
     def transport(self, value):
         self._transport = value
         self._keep_alive_timer = self.loop.call_later(self.keep_alive_period, self.keep_alive)
+        if self._delayed_start:
+            self.start(delayed=False)
 
     def push(self, state):
         self.transport.send(state)
 
-    def start(self):
-        self.start_time = time.time() * 1000
+    def start(self, delayed=True):
+        if self.transport:
+            self.start_time = time.time() * 1000
+            self.on(Signal('start'))
+        elif delayed:
+            self._delayed_start = True
 
     @property
     def time(self):

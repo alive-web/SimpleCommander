@@ -1,5 +1,4 @@
 import json
-from generic.game.base import BaseGame
 
 
 class Signal(object):
@@ -23,7 +22,6 @@ class JoystickControl(object):
     map = {}
 
     def __init__(self, game):
-        assert isinstance(game, BaseGame), 'Can\'t initiate joystick'
         self.game = game
 
     def on_button_pushed(self, button_code):
