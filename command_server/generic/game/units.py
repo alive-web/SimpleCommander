@@ -1,9 +1,5 @@
 import asyncio
-from collections import namedtuple
 from generic.game.signals import Signal
-
-Position2D = namedtuple('Position2D', ['x', 'y'])
-Position3D = namedtuple('Position3D', ['x', 'y', 'z'])
 
 
 class BaseUnit(object):
@@ -102,6 +98,37 @@ class UnitState(dict):
         unit._game.time = state_dict.pop('_time')
         unit.__dict__ = state_dict
         return cls(unit)
+
+
+class Position2D(object):
+    __slots__ = ['x', 'y']
+
+    def __init__(self, x=0, y=0):
+        self.x, self.y = x, y
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+
+    def __add__(self, other):
+        self.x += other[0]
+        self.y += other[1]
+
+
+class Position3D(object):
+    __slots__ = ['x', 'y', 'z']
+
+    def __init__(self, x=0, y=0, z=0):
+        self.x, self.y, self.z = x, y, z
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+        yield self.z
+
+    def __add__(self, other):
+        self.x += other[0]
+        self.y += other[1]
 
 
 class Positioned2DMixin(object):
