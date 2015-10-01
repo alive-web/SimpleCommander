@@ -15,13 +15,13 @@ class GameListView(JSONBaseView):
         return [game.info() for game in REGISTERED_GAMES.values()]
 
 
-@url_route('/game/{slug:\w+}')
+@url_route('/games/{slug:\w+}')
 class GameInfoView(JSONBaseView):
 
     @asyncio.coroutine
     def get(self, request, slug):
         if slug in REGISTERED_GAMES:
-            return REGISTERED_GAMES[slug].info()
+            return REGISTERED_GAMES[slug].info(True)
         else:
             raise HTTPNotFound
 

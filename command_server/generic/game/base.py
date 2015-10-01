@@ -20,14 +20,25 @@ class BaseGame(metaclass=game):
     version = '0.1.0'
     slug = None
     keep_alive_period = 5
+    scenarios = ()
 
     @classmethod
-    def info(cls):
-        return {
+    def info(cls, extended=False):
+        info = {
             'name': cls.name,
             'version:': cls.version,
             'slug': cls.slug,
         }
+        if extended:
+            extended_info = {
+                'scenarios': cls.get_scenarios_info()
+            }
+            info.update(extended_info)
+        return info
+
+    @classmethod
+    def get_scenarios_info(cls):
+        return {s.name: s.description for s in cls.scenarios}
 
     def __init__(self, loop=None):
         self.loop = loop or asyncio.get_event_loop()
