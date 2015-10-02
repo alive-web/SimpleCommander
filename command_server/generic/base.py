@@ -33,6 +33,11 @@ class StringResponseMixin(object):
             body= bytes(response, 'utf8'),
             content_type=self.content_type
         )
+        from command_server import DEBUG
+        if DEBUG:
+            response.headers.update({
+                'ACCESS-CONTROL-ALLOW-ORIGIN': '*'
+            })
         return response
 
 

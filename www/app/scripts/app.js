@@ -13,6 +13,7 @@ angular
     'ngAnimate',
     'ngCookies',
     'ngResource',
+    'ngMaterial',
     'ngSanitize',
     'ngTouch',
     'ui.router'
@@ -31,4 +32,5 @@ angular
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       });
-  });
+  })
+  .constant('ApiUrl', 'http://localhost:8000');

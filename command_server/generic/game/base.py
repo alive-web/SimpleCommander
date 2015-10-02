@@ -26,7 +26,7 @@ class BaseGame(metaclass=game):
     def info(cls, extended=False):
         info = {
             'name': cls.name,
-            'version:': cls.version,
+            'version': cls.version,
             'slug': cls.slug,
         }
         if extended:
