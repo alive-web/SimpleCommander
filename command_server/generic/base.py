@@ -96,6 +96,10 @@ class WebSocketView(BaseView):
             self.last_msg = msg
             if msg.tp == aiohttp.MsgType.text:
                 self.on_message(msg.data)
+            elif msg.tp == aiohttp.MsgType.close:
+                self.on_close()
+            elif msg.tp == aiohttp.MsgType.error:
+                self.on_error()
 
     def on_message(self, data):
         pass
@@ -109,10 +113,6 @@ class WebSocketView(BaseView):
     def send(self, msg):
         if not isinstance(msg, str):
             msg = json.dumps(msg, cls=IterableJSONEncoder)
-        elif msg.tp == aiohttp.MsgType.close:
-            self.on_close()
-        elif msg.tp == aiohttp.MsgType.error:
-            self.on_error()
         self.ws.send_str(msg)
 
     def get(self):
