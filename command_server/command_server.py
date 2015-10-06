@@ -6,11 +6,15 @@ import jinja2
 import websockets
 
 import views
+import games
+# import generic.game.base
 
 from aiohttp import server, web
 from time import gmtime, strftime
 
 from generic import routes
+
+DEBUG = True
 
 
 class BaseCommandServer(object):

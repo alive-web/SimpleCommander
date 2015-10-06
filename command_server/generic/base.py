@@ -1,8 +1,11 @@
 import asyncio
+import aiohttp
 import aiohttp_jinja2
 import json
 
+from aiohttp import web
 from aiohttp.web_reqrep import Response
+from generic.encoders import IterableJSONEncoder
 
 
 class BaseView(object):
@@ -30,6 +33,11 @@ class StringResponseMixin(object):
             body= bytes(response, 'utf8'),
             content_type=self.content_type
         )
+        from command_server import DEBUG
+        if DEBUG:
+            response.headers.update({
+                'ACCESS-CONTROL-ALLOW-ORIGIN': '*'
+            })
         return response
 
 
@@ -63,3 +71,49 @@ class TemplateResponseMixin(object):
 
 class TemplateView(TemplateResponseMixin, BaseView):
     pass
+
+
+class RedirectView(BaseView):
+    redirect_url = None
+
+    @asyncio.coroutine
+    def get(self, request, *args, **kwargs):
+        return
+
+    def finalize_response(self, response):
+        return aiohttp.web.HTTPFound(response or self.redirect_url)
+
+
+class WebSocketView(BaseView):
+
+    @asyncio.coroutine
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        self.ws = web.WebSocketResponse()
+        self.ws.start(request)
+        while True:
+            msg = yield from self.ws.receive()
+            self.last_msg = msg
+            if msg.tp == aiohttp.MsgType.text:
+                self.on_message(msg.data)
+
+    def on_message(self, data):
+        pass
+
+    def on_close(self):
+        pass
+
+    def on_error(self):
+        pass
+
+    def send(self, msg):
+        if not isinstance(msg, str):
+            msg = json.dumps(msg, cls=IterableJSONEncoder)
+        elif msg.tp == aiohttp.MsgType.close:
+            self.on_close()
+        elif msg.tp == aiohttp.MsgType.error:
+            self.on_error()
+        self.ws.send_str(msg)
+
+    def get(self):
+        pass
