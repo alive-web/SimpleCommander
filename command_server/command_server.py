@@ -14,6 +14,8 @@ from time import gmtime, strftime
 
 from generic import routes
 
+DEBUG = True
+
 
 class BaseCommandServer(object):
 
