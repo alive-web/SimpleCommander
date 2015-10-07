@@ -22,7 +22,8 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath || 'app',
-    dist: 'dist'
+    dist: 'dist',
+    python_root: '../command_server'
   };
 
   // Define the configuration for all the tasks
@@ -407,6 +408,11 @@ module.exports = function (grunt) {
           cwd: '.',
           src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
           dest: '<%= yeoman.dist %>'
+        }, {
+          expand: true,
+          cwd: '<%= yeoman.python_root %>/games',
+          dest: '<%= yeoman.dist %>/game_resources',
+          src: '*/www/{,*/}*.{json,js,css,ico,png,jpg,svg}'
         }]
       },
       styles: {
@@ -414,6 +420,12 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
+      },
+      games: {
+        expand: true,
+        cwd: '<%= yeoman.python_root %>/games',
+        dest: '.tmp/game_resources/',
+        src: '*/www/{,*/}*.{json,js,css,ico,png,jpg,svg}'
       }
     },
 
@@ -449,6 +461,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'copy:games',
       'wiredep',
       'concurrent:server',
       'autoprefixer:server',
