@@ -1,0 +1,9 @@
+<div layout="row" layout-wrap class="colorNested">
+  <md-card ng-repeat="game in games" flex="33">
+    <img ng-src="{{ game.manifest.favicon }}" class="md-card-image" alt="{{ game.name }}"/>
+    <md-card-content>
+      <h2 class="md-title">{{ game.name }}</h2>
+      <div>{{ game.version }}</div>
+    </md-card-content>
+  </md-card>
+</div>

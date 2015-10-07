@@ -33,6 +33,11 @@ class StringResponseMixin(object):
             body= bytes(response, 'utf8'),
             content_type=self.content_type
         )
+        from command_server import DEBUG
+        if DEBUG:
+            response.headers.update({
+                'ACCESS-CONTROL-ALLOW-ORIGIN': '*'
+            })
         return response
 
 
@@ -88,9 +93,21 @@ class WebSocketView(BaseView):
         self.ws.start(request)
         while True:
             msg = yield from self.ws.receive()
-            self.on_message(msg)
+            self.last_msg = msg
+            if msg.tp == aiohttp.MsgType.text:
+                self.on_message(msg.data)
+            elif msg.tp == aiohttp.MsgType.close:
+                self.on_close()
+            elif msg.tp == aiohttp.MsgType.error:
+                self.on_error()
 
-    def on_message(self, msg):
+    def on_message(self, data):
+        pass
+
+    def on_close(self):
+        pass
+
+    def on_error(self):
         pass
 
     def send(self, msg):
