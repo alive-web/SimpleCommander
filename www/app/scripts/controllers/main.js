@@ -11,5 +11,5 @@ angular.module('wwwApp')
   .controller('MainCtrl', function ($scope, Games) {
     Games.list().success(function(data) {
       $scope.games = data;
-    })
+    });
   });
