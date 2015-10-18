@@ -35,7 +35,7 @@ test:
 
 run-server:
 	. env/bin/activate; \
-	python command_server/command_server.py
+	python game_commander/game_commander.py
 
 run-grunt:
 	cd www/; \
